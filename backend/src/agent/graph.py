@@ -36,6 +36,28 @@ load_dotenv()
 if os.getenv("GEMINI_API_KEY") is None:
     raise ValueError("GEMINI_API_KEY is not set")
 
+import requests
+import os
+# 确保环境变量已设置
+print(f"HTTP_PROXY: `{os.getenv('HTTP_PROXY')}`")
+print(f"HTTPS_PROXY: `{os.getenv('HTTPS_PROXY')}`")
+try:
+    # 尝试访问一个外部网站，例如 Google (如果你的代理允许访问)
+    # 或者一个不会被墙的网站，但要确保代理是为访问Google服务而设的
+    response = requests.get("https://www.google.com", timeout=10)
+    response.raise_for_status() # 对非成功状态码抛出异常
+    print(f"Status code: {response.status_code}")
+    print("Proxy test successful!")
+except requests.exceptions.Timeout:
+    print("Proxy test failed: Request timed out.")
+except requests.exceptions.ConnectionError as e:
+    print(f"Proxy test failed: Connection error - {e}")
+except requests.exceptions.RequestException as e:
+    print(f"Proxy test failed: An error occurred - {e}")
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
+
+
 # Used for Google Search API
 genai_client = Client(api_key=os.getenv("GEMINI_API_KEY"))
 
@@ -66,6 +88,7 @@ def generate_query(state: OverallState, config: RunnableConfig) -> QueryGenerati
         temperature=1.0,
         max_retries=2,
         api_key=os.getenv("GEMINI_API_KEY"),
+        timeout=10,
     )
     structured_llm = llm.with_structured_output(SearchQueryList)
 
@@ -168,6 +191,7 @@ def reflection(state: OverallState, config: RunnableConfig) -> ReflectionState:
         temperature=1.0,
         max_retries=2,
         api_key=os.getenv("GEMINI_API_KEY"),
+        timeout=10,
     )
     result = llm.with_structured_output(Reflection).invoke(formatted_prompt)
 
@@ -247,6 +271,7 @@ def finalize_answer(state: OverallState, config: RunnableConfig):
         temperature=0,
         max_retries=2,
         api_key=os.getenv("GEMINI_API_KEY"),
+        timeout=10,
     )
     result = llm.invoke(formatted_prompt)
 
