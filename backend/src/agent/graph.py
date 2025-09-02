@@ -86,7 +86,7 @@ def generate_query(state: OverallState, config: RunnableConfig) -> QueryGenerati
     llm = ChatGoogleGenerativeAI(
         model=configurable.query_generator_model,
         temperature=1.0,
-        max_retries=2,
+        max_retries=5,  # 增加重试次数
         api_key=os.getenv("GEMINI_API_KEY"),
         timeout=10,
     )
@@ -189,7 +189,7 @@ def reflection(state: OverallState, config: RunnableConfig) -> ReflectionState:
     llm = ChatGoogleGenerativeAI(
         model=reasoning_model,
         temperature=1.0,
-        max_retries=2,
+        max_retries=5,  # 增加重试次数
         api_key=os.getenv("GEMINI_API_KEY"),
         timeout=10,
     )
@@ -269,7 +269,7 @@ def finalize_answer(state: OverallState, config: RunnableConfig):
     llm = ChatGoogleGenerativeAI(
         model=reasoning_model,
         temperature=0,
-        max_retries=2,
+        max_retries=5,  # 增加重试次数
         api_key=os.getenv("GEMINI_API_KEY"),
         timeout=10,
     )
